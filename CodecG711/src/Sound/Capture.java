@@ -6,7 +6,7 @@ package Sound;
 
 /**
  *
- * @author Laura
+ * @author Catheryne
  */
 import codec.Coder;
 import codec.Decoder;
@@ -19,7 +19,7 @@ import javax.sound.sampled.*;
 
 /**
  *
- * @author Giraldo
+ * @author Catheryne
  */
 public class Capture extends Ld8k {
 
