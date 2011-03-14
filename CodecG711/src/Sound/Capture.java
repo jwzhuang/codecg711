@@ -8,14 +8,13 @@ package Sound;
  *
  * @author Catheryne
  */
-import codec.Coder;
-import codec.Decoder;
-import codec.Ld8k;
-import codec.Util;
+import codecg711.Ld8k;
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.*;
+import org.mobicents.media.server.impl.dsp.audio.g711.alaw.*;
+import org.mobicents.media.server.spi.memory.*;
 
 /**
  *
@@ -28,6 +27,8 @@ public class Capture extends Ld8k {
     ByteArrayOutputStream codificado = new ByteArrayOutputStream();
     ByteArrayOutputStream decodificado = new ByteArrayOutputStream();
 
+    Frame frmCodificado;
+    Frame frmDecodificado;
     /* public void captureAudio() {
     try {
 
@@ -157,8 +158,12 @@ public class Capture extends Ld8k {
                             }
                         }
                         out.close();
-                        codificado = new Coder().mainCodec(out.toByteArray());
-                        codificado.close();
+                        Frame f = new Frame(null, out.toByteArray());
+                        f.setLength(out.toByteArray().length);
+                        frmCodificado = new Encoder().process(f);
+//                        codificado = new ByteArrayOutputStream(frmCodificado.getData().length);
+//                        codificado.write(frmCodificado.getData(), 0, frmCodificado.getData().length);
+//                        codificado.close();
                     } catch (IOException e) {
                         System.err.println("I/O problems: " + e);
                         System.exit(-1);
@@ -275,21 +280,24 @@ public class Capture extends Ld8k {
     }*/
     public void playAudio() {
         try {
-            try {
-                decodificado = new Decoder().mainCodec(codificado.toByteArray());
-            } catch (IOException ex) {
-                Logger.getLogger(Capture.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
+//            try {
+//                decodificado = new Decoder().mainCodec(codificado.toByteArray());
+//            } catch (IOException ex) {
+//                Logger.getLogger(Capture.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+            Frame f = new Frame(null, frmCodificado.getData());
+            f.setLength(frmCodificado.getData().length);
+            frmDecodificado = new Decoder().process(f);
             byte audio[] = decodificado.toByteArray();
             byte audio2[] = out.toByteArray();
+            byte audio3[] = frmDecodificado.getData();
 
             InputStream input =
-                    new ByteArrayInputStream(audio2);
+                    new ByteArrayInputStream(audio3);
             final AudioFormat format = getFormat();
             final AudioInputStream ais =
                     new AudioInputStream(input, format,
-                    audio2.length / format.getFrameSize());
+                    audio3.length / format.getFrameSize());
             DataLine.Info info = new DataLine.Info(
                     SourceDataLine.class, format);
             final SourceDataLine line = (SourceDataLine) AudioSystem.getLine(info);
