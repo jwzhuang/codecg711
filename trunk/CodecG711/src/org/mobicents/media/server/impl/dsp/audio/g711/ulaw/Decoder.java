@@ -117,7 +117,8 @@ public class Decoder implements Codec {
     private int process(byte[] media, int offset, int len, byte[] res) {
         int j = 0;
         for (int i = 0; i < len; i++) {
-            short s = muLawDecompressTable[media[i + offset] & 0xff];
+            //short s = muLawDecompressTable[media[i + offset] & 0xff];
+            short s = ulaw2linear(media[i]);
             res[j++] = (byte) s;
             res[j++] = (byte) (s >> 8);
         }
