@@ -10,10 +10,9 @@ package Sound;
  */
 import codecg711.Ld8k;
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.sampled.*;
-import org.mobicents.media.server.impl.dsp.audio.g711.alaw.*;
+import org.mobicents.media.server.impl.dsp.audio.g711.ulaw.Decoder;
+import org.mobicents.media.server.impl.dsp.audio.g711.ulaw.Encoder;
 import org.mobicents.media.server.spi.memory.*;
 
 /**
@@ -161,9 +160,15 @@ public class Capture extends Ld8k {
                         Frame f = new Frame(null, out.toByteArray());
                         f.setLength(out.toByteArray().length);
                         frmCodificado = new Encoder().process(f);
-//                        codificado = new ByteArrayOutputStream(frmCodificado.getData().length);
-//                        codificado.write(frmCodificado.getData(), 0, frmCodificado.getData().length);
+//                        byte[] s = out.toByteArray();
+//                        byte[] cod = new byte[s.length];
+//                        G711.linear2ulaw(s, 0, cod, s.length);
+//                        codificado = new ByteArrayOutputStream(cod.length);
+//                        codificado.write(cod);
 //                        codificado.close();
+                        codificado = new ByteArrayOutputStream(frmCodificado.getData().length);
+                        codificado.write(frmCodificado.getData(), 0, frmCodificado.getData().length);
+                        codificado.close();
                     } catch (IOException e) {
                         System.err.println("I/O problems: " + e);
                         System.exit(-1);
@@ -285,12 +290,15 @@ public class Capture extends Ld8k {
 //            } catch (IOException ex) {
 //                Logger.getLogger(Capture.class.getName()).log(Level.SEVERE, null, ex);
 //            }
-            Frame f = new Frame(null, frmCodificado.getData());
-            f.setLength(frmCodificado.getData().length);
-            frmDecodificado = new Decoder().process(f);
-            byte audio[] = decodificado.toByteArray();
-            byte audio2[] = out.toByteArray();
+//            Frame f = new Frame(null, frmCodificado.getData());
+//            f.setLength(frmCodificado.getData().length);
+            frmDecodificado = new Decoder().process(frmCodificado);
+//            byte audio[] = decodificado.toByteArray();
+//            byte audio2[] = out.toByteArray();
             byte audio3[] = frmDecodificado.getData();
+            //byte audio3[] = new byte[codificado.toByteArray().length];
+            //G711.ulaw2linear(codificado.toByteArray(), audio3, audio3.length);
+            //byte[] audio3 = codificado.toByteArray();
 
             InputStream input =
                     new ByteArrayInputStream(audio3);
